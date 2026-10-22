@@ -10,7 +10,7 @@
 
 Welcome to **`flipnote-tools-js`**—the Swiss Army Knife for Flipnote Studio (`.ppm`) and Flipnote Studio 3D (`.kwz`, `.kwc`, folder icons). 
 
-Whether you want to rescue corrupted childhood masterpieces from a dusty SD card, turn a modern MP4 meme into a console-ready Flipnote, edit layers with a 100-step undo history, or embed a WebGL-powered player with a 10-band equalizer on your blog, this toolkit does it all. Best of all? The core library has **zero mandatory dependencies**. Yes, we actually wrote our own H.264 video encoder, AAC audio encoder, JPEG/PNG/GIF/APNG codecs, and RSA cryptography from scratch in pure TypeScript. *Send help (or coffee).*
+Whether you want to rescue corrupted childhood masterpieces from a dusty SD card, turn a modern MP4 meme into a console-ready Flipnote, edit layers with a 100-step undo history, or embed a WebGL-powered player with a 10-band equalizer on your blog, this toolkit does it all. Best of all? The core library has **zero mandatory dependencies**. 
 
 ### Features (Why is this thing so huge?)
 
@@ -207,7 +207,7 @@ All original source code in this repository is released into the **public domain
 **`flipnote-tools-js`** へようこそ！これは『うごくメモ帳』（DSi `.ppm`）および『うごくメモ帳 3D』（3DS `.kwz`, `.kwc`, フォルダアイコン）のための、ちょっとやりすぎな万能ツールキットです。
 
 押し入れのSDカードから発掘した黒歴史（あるいは名作）の破損データを修復したい時も、最新のMP4動画をうごメモに変換して実機で再生したい時も、100段階のUndo履歴付きでレイヤー編集したい時も、WebGLと10バンドイコライザーを搭載したプレイヤーをWebサイトに埋め込みたい時も、これ1つで全て完結します。
-しかも、コアライブラリの**外部依存パッケージはゼロ（Zero Dependencies）**です。はい、純粋なTypeScriptだけでH.264動画エンコーダ、AAC音声エンコーダ、JPEG/PNG/GIF/APNGコーデック、さらにはRSA署名エンジンまでゼロから自作しました。（※正気です。たぶん。）
+しかも、コアライブラリの外部依存パッケージはゼロです。
 
 ### 主な特徴と使える機能すべて
 
@@ -307,7 +307,7 @@ npx flipnote-tools gallery ./my_notes ./web_gallery --title "うごメモ保管�
 
 ¡Bienvenido a **`flipnote-tools-js`**! La navaja suiza definitiva para Flipnote Studio (DSi `.ppm`) y Flipnote Studio 3D (3DS `.kwz`, `.kwc`, iconos de carpetas).
 
-Ya sea que quieras rescatar tus obras maestras de la infancia desde una tarjeta SD dañada, convertir un meme en MP4 en una Flipnote lista para reproducirse en una consola real, editar capas con un historial de 100 pasos para deshacer, o incrustar un reproductor WebGL con ecualizador de 10 bandas en tu página web, esta herramienta lo hace todo. ¿Y lo mejor? La librería principal tiene **cero dependencias obligatorias**. Sí, programamos nuestro propio codificador de video H.264, codificador de audio AAC, códecs JPEG/PNG/GIF/APNG y criptografía RSA desde cero en TypeScript puro. *(No pregunten cuántas tazas de café costó esto).*
+Ya sea que quieras rescatar tus obras maestras de la infancia desde una tarjeta SD dañada, convertir un meme en MP4 en una Flipnote lista para reproducirse en una consola real, editar capas con un historial de 100 pasos para deshacer, o incrustar un reproductor WebGL con ecualizador de 10 bandas en tu página web, esta herramienta lo hace todo. ¿Y lo mejor? La librería principal tiene **cero dependencias obligatorias**. 
 
 ### Características Principales
 
