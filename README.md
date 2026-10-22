@@ -233,7 +233,7 @@ All original source code in this repository is released into the **public domain
   * **`carveNotes`:** SDカードやNANDの生のバイナリイメージから、削除・紛失した `.ppm` / `.kwz` ファイルをシグネチャ検索で丸ごと掘り起こします。
 * **暗号処理＆秘密鍵ハンター (`findSigningKeys`):**
   * SHA-1 / SHA-256、RSA-1024 / RSA-2048 の署名・検証を自前実装。アプリのバイナリ（`code.bin` 等）やテキストを渡すだけで、公開鍵とペアになるRSA秘密鍵を自動的に探し出して抽出します。
-* * `<flipnote-player>` Webコンポーネント:*
+* * `<flipnote-player>` Webコンポーネント:
   * HTMLにタグを貼るだけで動くカスタム要素。ダークモード、ドラッグ＆ドロップ再生、フルスクリーン、3D立体視モード（赤青メガネ `anaglyph`、サイドバイサイド等）、リアルタイムEQスライダー、そしてどんな拡大率でもドットが滲まない **WebGL シャープバイリニア拡大**に対応。
 * **データベース＆静的Webギャラリー生成:**
   * 大量のメモを高速スキャンしてJSON化（`NoteDatabase`）。作者やタグでの検索、フレームデータのハッシュ（`contentId`）による重複作品検出、派生作品（スピンオフ）の家系図検索、そして1コマンドでプレイヤー付きの静的HTMLギャラリーサイトを生成できます。
