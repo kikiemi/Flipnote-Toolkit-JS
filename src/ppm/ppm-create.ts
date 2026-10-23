@@ -43,7 +43,8 @@ export interface PpmSource extends PpmEncodeOptions {
 /** Metadata for a new note; one random author ID and filename unless overridden. */
 export function createPpmMeta(overrides: Partial<PpmMeta> = {}): PpmMeta {
   const authorId = (overrides.currentAuthorId ?? createPpmFsid()).toUpperCase();
-  const filename = overrides.currentFilename ?? createPpmFilename(authorId.slice(10));
+  const timestamp = overrides.timestamp ?? currentTimestamp();
+  const filename = overrides.currentFilename ?? createPpmFilename(authorId.slice(10), timestamp);
   const name = overrides.currentAuthorName ?? DEFAULT_AUTHOR_NAME;
   const frameSpeed = overrides.frameSpeed ?? 6;
   return {
@@ -59,7 +60,7 @@ export function createPpmMeta(overrides: Partial<PpmMeta> = {}): PpmMeta {
     parentFilename: filename,
     currentFilename: filename,
     rootFilenameFragment: createPpmRootFragment(filename),
-    timestamp: currentTimestamp(),
+    timestamp,
     frameSpeed,
     bgmSpeed: frameSpeed,
     isLooping: false,

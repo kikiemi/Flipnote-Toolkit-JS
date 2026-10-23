@@ -5,6 +5,7 @@ export {
   getFrameRates,
   getNoteInfo,
   getPalette,
+  getStorageFilename,
   getVariant,
   readNote,
   writeNote,
@@ -121,6 +122,7 @@ export {
   type FrameImportOptions,
   type ImagesImportOptions,
   type NoteBuilderOptions,
+  type VideoImportOptions,
 } from './note/import.ts';
 export {
   createAnaglyphPalette,

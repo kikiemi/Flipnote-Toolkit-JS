@@ -19,12 +19,15 @@ async function bundle(entry, options = {}) {
   return result.outputFiles[0].text;
 }
 
+async function emit(name, contents) {
+  await writeFile(join(out, name), contents);
+  console.log(`dist/web/${name}: ${(contents.length / 1024).toFixed(0)} KB`);
+}
+
 await mkdir(out, { recursive: true });
 
 const player = await bundle('src/player/standalone.ts', {
   format: 'iife',
   globalName: 'FlipnotePlayerKit',
 });
-await writeFile(join(out, 'flipnote-player.js'), player);
-
-console.log(`dist/web/flipnote-player.js: ${(player.length / 1024).toFixed(0)} KB`);
+await emit('flipnote-player.js', player);

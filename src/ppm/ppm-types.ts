@@ -9,6 +9,8 @@ export const PPM_THUMBNAIL_WIDTH = 64;
 export const PPM_THUMBNAIL_HEIGHT = 48;
 export const PPM_THUMBNAIL_SIZE = 1536;
 export const PPM_SAMPLE_RATE = 8180;
+/** Tick rate of the DSi's clock (33.513982 MHz / 64), which PPM filenames count in. */
+export const PPM_TICKS_PER_SECOND = 33513982 / 64;
 /** The DSi mixes at about 32728 Hz, upsampling tracks with nearest-neighbour. */
 export const PPM_OUTPUT_SAMPLE_RATE = 32728;
 export const PPM_FORMAT_VERSION = 0x24;
@@ -75,8 +77,11 @@ export type PpmSeName = (typeof PPM_SE_NAMES)[number];
 
 /** `<mac>_<13 characters>_<edits>`, e.g. F78DA8_14768882B56B8_030. */
 export interface PpmFilename {
+  /** Last 6 hex digits of the console's MAC address (the author ID's last 6). */
   mac: string;
-  random: string;
+  /** Console ticks since 2000 when the name was made, as 13 hex digits. */
+  ticks: string;
+  /** Times the author saved the note again (0 for a new note or spin-off). */
   edits: number;
 }
 

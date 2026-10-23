@@ -442,7 +442,7 @@ export function convertPpmToKwz(file: PpmFile, options: ToKwzOptions = {}): KwzF
 function createPpmMetaFromKwz(file: KwzFile, options: ToPpmOptions): Partial<PpmMeta> {
   const { meta } = file;
   const authorId = options.authorId?.toUpperCase() ?? convertKwzFsidToPpm(meta.currentAuthorId);
-  const fresh = createPpmFilename(authorId.slice(10));
+  const fresh = createPpmFilename(authorId.slice(10), meta.modifiedTime);
   const current =
     isPpmFilename(meta.currentFilename) && !options.authorId
       ? parsePpmFilename(meta.currentFilename)

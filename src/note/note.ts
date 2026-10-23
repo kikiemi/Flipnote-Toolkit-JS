@@ -12,6 +12,7 @@ import {
   type KwzPaletteName,
 } from '../kwz/kwz-types.ts';
 import { writeKwz } from '../kwz/kwz-writer.ts';
+import { formatPpmStorageFilename } from '../ppm/ppm-filename.ts';
 import { isPpm, readPpm } from '../ppm/ppm-reader.ts';
 import {
   PPM_FRAME_RATES,
@@ -73,6 +74,12 @@ export function getFrameCount(note: NoteFile): number {
 
 export function getVariant(note: NoteFile): NoteVariant {
   return note.format === 'ppm' ? 'ppm' : note.variant;
+}
+
+/** Name the console stores the note under on the SD card. */
+export function getStorageFilename(note: NoteFile): string {
+  if (note.format === 'ppm') return formatPpmStorageFilename(note.meta.currentFilename);
+  return note.variant === 'icon' ? '!.ico' : `${note.meta.currentFilename}.${note.variant}`;
 }
 
 export function getFrameRates(format: NoteFormat): readonly number[] {

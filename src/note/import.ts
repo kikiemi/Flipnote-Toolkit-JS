@@ -333,6 +333,16 @@ export interface AnimationImportOptions extends Omit<
   onProgress?: (done: number, total: number) => void;
 }
 
+/** Options for importing a video clip (with mediabunny or ffmpeg). */
+export interface VideoImportOptions extends AnimationImportOptions {
+  /** First second of the source to use (default 0). */
+  start?: number;
+  /** Last second of the source to use (default the end). */
+  end?: number;
+  /** Store the video's soundtrack as BGM, up to 60 seconds (default true). */
+  isAudioIncluded?: boolean;
+}
+
 function median(values: readonly number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted.length ? sorted[sorted.length >> 1] : DEFAULT_GIF_DELAY;

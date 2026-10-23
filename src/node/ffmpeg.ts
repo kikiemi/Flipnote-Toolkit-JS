@@ -2,9 +2,8 @@ import { spawn } from 'node:child_process';
 import type { Pcm } from '../audio/pcm.ts';
 import { check, fail, FlipnoteError } from '../core/errors.ts';
 import { KWZ_MAX_BGM_SECONDS } from '../kwz/kwz-types.ts';
-import { NoteBuilder, planFrameTiming } from '../note/import.ts';
+import { NoteBuilder, planFrameTiming, type VideoImportOptions } from '../note/import.ts';
 import type { NoteFile, NoteFormat } from '../note/note.ts';
-import type { VideoImportOptions } from '../video/video-import.ts';
 
 export interface FfmpegImportOptions extends VideoImportOptions {
   /** ffmpeg executable (default "ffmpeg"); ffprobe is looked up next to it. */

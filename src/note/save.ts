@@ -22,6 +22,7 @@ export interface SaveOptions {
   time?: number;
   /** PPM: 'overwrite' keeps the file name, 'copy' saves under a new name (default 'overwrite'). */
   mode?: 'overwrite' | 'copy';
+  /** Picks the moment within the second that new PPM filenames count from (default Math.random). */
   random?: () => number;
 }
 
@@ -50,7 +51,7 @@ function savePpmMeta(meta: PpmMeta, options: SaveOptions): PpmMeta {
     next.currentAuthorName = author.name;
     next.currentFilename =
       options.mode === 'copy'
-        ? { ...createPpmFilename(mac, options.random), edits }
+        ? { ...createPpmFilename(mac, time, options.random), edits }
         : { ...meta.currentFilename, edits };
     return next;
   }
@@ -59,7 +60,7 @@ function savePpmMeta(meta: PpmMeta, options: SaveOptions): PpmMeta {
   next.parentFilename = meta.currentFilename;
   next.currentAuthorName = author.name;
   next.currentAuthorId = author.id.toUpperCase();
-  next.currentFilename = createPpmFilename(mac, options.random);
+  next.currentFilename = createPpmFilename(mac, time, options.random);
   next.isLocked = false;
   return next;
 }

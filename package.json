@@ -37,7 +37,8 @@
       "types": "./dist/node/index.d.ts",
       "import": "./dist/node/index.js"
     },
-    "./web/flipnote-player.js": "./dist/web/flipnote-player.js"
+    "./web/flipnote-player.js": "./dist/web/flipnote-player.js",
+    "./package.json": "./package.json"
   },
   "bin": {
     "flipnote-tools": "./dist/cli/cli.js"
@@ -45,8 +46,7 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE",
-    "NOTICE.md"
+    "LICENSE"
   ],
   "sideEffects": [
     "./dist/cli/cli.js",
@@ -60,7 +60,8 @@
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build": "npm run clean && tsc -p tsconfig.json && node scripts/build-web.mjs",
     "check": "tsc -p tsconfig.json --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepack": "npm run build"
   },
   "peerDependencies": {
     "mediabunny": ">=1.45.0"

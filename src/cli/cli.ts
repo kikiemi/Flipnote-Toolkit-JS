@@ -41,6 +41,7 @@ import { importAnimation } from '../note/import.ts';
 import { inspectNote } from '../note/inspect.ts';
 import {
   getFrameCount,
+  getStorageFilename,
   readNote,
   writeNote,
   type NoteFile,
@@ -49,7 +50,6 @@ import {
 import { readPlaylist } from '../note/playlist.ts';
 import { carveNotes, repairNote } from '../note/repair.ts';
 import { getSigningKeys, setSigningKeys, signNote, verifyNote } from '../note/signature.ts';
-import { formatPpmStorageFilename } from '../ppm/ppm-filename.ts';
 import type { PpmMeta } from '../ppm/ppm-types.ts';
 
 const HELP = `flipnote-tools — Flipnote Toolkit JS
@@ -82,6 +82,9 @@ Collections
   thumbs <directory> <out-directory>       [--width N] [--animated]
   gallery <directory> <out-directory>      static web page with a player [--title T] [--animated]
   playlist <file.pls|lst> [--format ppm|kwz]
+
+Notes written to a folder get the file name the console would give them (PPM storage names,
+KWZ base32 names, !.ico); --format ppm|kwz picks the format there (convert, import).
 
 Common options
   --key path         signing keys to use instead of ./keys or the built-in ones
@@ -160,17 +163,32 @@ async function write(path: string, bytes: Uint8Array): Promise<void> {
   console.log(`wrote ${path} (${bytes.length} bytes)`);
 }
 
-function storageName(note: NoteFile): string {
-  if (note.format === 'ppm') return formatPpmStorageFilename(note.meta.currentFilename);
-  return note.variant === 'icon' ? '!.ico' : `${note.meta.currentFilename}.${note.variant}`;
-}
-
 /** Writes a note, signed with the default keys, and prints its SD card name. */
 async function writeNoteFile(path: string, note: NoteFile): Promise<void> {
   const bytes = writeNote(note, { onWarning: (message) => console.warn(`warning: ${message}`) });
-  await write(path, bytes);
+  await write(await notePath(path, note), bytes);
   const status = verifyNote(bytes) ? '' : ' (unsigned)';
-  console.log(`SD card file name: ${storageName(note)}${status}`);
+  console.log(`SD card file name: ${getStorageFilename(note)}${status}`);
+}
+
+/** True for an existing directory or a path ending in a separator. */
+async function isFolder(path: string): Promise<boolean> {
+  if (/[\\/]$/.test(path)) return true;
+  return stat(path).then(
+    (info) => info.isDirectory(),
+    () => false,
+  );
+}
+
+/** `path`, or the note's SD card file name inside it when `path` is a folder. */
+async function notePath(path: string, note: NoteFile): Promise<string> {
+  return (await isFolder(path)) ? join(path, getStorageFilename(note)) : path;
+}
+
+/** Note format of an output: its extension, or --format (else `fallback`) for a folder. */
+async function outputFormat(output: string, args: Arguments, fallback: string): Promise<string> {
+  if (await isFolder(output)) return text(args, 'format') ?? fallback;
+  return extname(output).slice(1).toLowerCase();
 }
 
 function exportOptions(args: Arguments) {
@@ -270,7 +288,7 @@ async function commandRepair(args: Arguments): Promise<number> {
     console.error('Nothing could be recovered.');
     return 1;
   }
-  await write(output, result.bytes);
+  await write(await notePath(output, result.note), result.bytes);
   console.log(
     `${getFrameCount(result.note)} frames, ${result.damagedFrames.length} damaged; console compatible: ${result.after?.isCompatible}`,
   );
@@ -318,7 +336,8 @@ async function commandMeta(args: Arguments): Promise<void> {
 
 async function commandSign(args: Arguments): Promise<void> {
   for (const path of args.positional) {
-    await write(text(args, 'out') ?? path, signNote(await read(path)));
+    const bytes = signNote(await read(path));
+    await write(await notePath(text(args, 'out') ?? path, readNote(bytes)), bytes);
   }
 }
 
@@ -359,7 +378,7 @@ async function exportVideoFile(
 async function commandConvert(args: Arguments): Promise<void> {
   const [input, output] = args.positional;
   const note = readNote(await read(input));
-  const extension = extname(output).slice(1).toLowerCase();
+  const extension = await outputFormat(output, args, note.format === 'ppm' ? 'kwz' : 'ppm');
   const options = exportOptions(args);
   const authorId = text(args, 'author-id');
   const convert = {
@@ -468,9 +487,9 @@ async function importVideoFile(
 async function commandImport(args: Arguments): Promise<void> {
   const output = args.positional.at(-1)!;
   const inputs = args.positional.slice(0, -1);
-  const format = extname(output).slice(1).toLowerCase() as NoteFormat;
+  const format = (await outputFormat(output, args, 'kwz')) as NoteFormat;
   if (format !== 'ppm' && format !== 'kwz') {
-    fail('INVALID_ARGUMENT', 'The output must end in .ppm or .kwz');
+    fail('INVALID_ARGUMENT', 'The output must end in .ppm or .kwz, or be a folder');
   }
   const fps = text(args, 'fps');
   const bgmPath = text(args, 'bgm');

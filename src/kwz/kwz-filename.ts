@@ -149,7 +149,7 @@ export function writeKwzFilename(bytes: Uint8Array, offset: number, name: string
   const parts = parsePpmFilename(name);
   bytes.fill(0, offset, offset + FILENAME_LENGTH);
   bytes.set(hexToBytes(parts.mac), offset);
-  writeAscii(bytes, offset + 3, 13, parts.random);
+  writeAscii(bytes, offset + 3, 13, parts.ticks);
   bytes[offset + 16] = parts.edits & 0xff;
   bytes[offset + 17] = parts.edits >> 8;
 }

@@ -2,19 +2,10 @@ import type { AudioSample, Input } from 'mediabunny';
 import { downmixToPcm, type Pcm } from '../audio/pcm.ts';
 import { check, fail } from '../core/errors.ts';
 import { KWZ_MAX_BGM_SECONDS } from '../kwz/kwz-types.ts';
-import { NoteBuilder, planFrameTiming, type AnimationImportOptions } from '../note/import.ts';
+import { NoteBuilder, planFrameTiming, type VideoImportOptions } from '../note/import.ts';
 import type { NoteFile, NoteFormat } from '../note/note.ts';
 import { createSource, loadMediabunny, type MediaInput } from './mediabunny.ts';
 import { sampleToRgba } from './video-frames.ts';
-
-export interface VideoImportOptions extends AnimationImportOptions {
-  /** First second of the source to use (default 0). */
-  start?: number;
-  /** Last second of the source to use (default the end). */
-  end?: number;
-  /** Store the video's soundtrack as BGM, up to 60 seconds (default true). */
-  isAudioIncluded?: boolean;
-}
 
 async function readAudio(input: Input, start: number, end: number): Promise<Pcm | null> {
   const track = await input.getPrimaryAudioTrack();

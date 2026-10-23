@@ -1,6 +1,7 @@
 import { check } from '../core/errors.ts';
 import { bytesToHex, hexToBytes, isHex } from '../core/text.ts';
-import type { PpmFilename } from './ppm-types.ts';
+import { currentTimestamp } from '../core/time.ts';
+import { PPM_TICKS_PER_SECOND, type PpmFilename } from './ppm-types.ts';
 
 export type FlipnoteRegion = 'japan' | 'americas' | 'europe' | 'unknown';
 
@@ -31,13 +32,13 @@ export function getPpmFsidRegion(id: string): FlipnoteRegion {
 }
 
 export function formatPpmFilename(name: PpmFilename): string {
-  return `${name.mac.toUpperCase()}_${name.random}_${String(name.edits).padStart(3, '0')}`;
+  return `${name.mac.toUpperCase()}_${name.ticks}_${String(name.edits).padStart(3, '0')}`;
 }
 
 export function parsePpmFilename(text: string): PpmFilename {
   const match = FILENAME_PATTERN.exec(text.replace(/\.ppm$/i, ''));
   check(match, 'INVALID_ARGUMENT', `Invalid PPM filename "${text}"`);
-  return { mac: match[1].toUpperCase(), random: match[2].toUpperCase(), edits: Number(match[3]) };
+  return { mac: match[1].toUpperCase(), ticks: match[2].toUpperCase(), edits: Number(match[3]) };
 }
 
 export function isPpmFilename(text: string): boolean {
@@ -46,21 +47,19 @@ export function isPpmFilename(text: string): boolean {
 
 /** Reads the 18-byte form: 3-byte MAC, 13 characters, uint16 edit counter. */
 export function readPpmFilename(bytes: Uint8Array, offset: number): PpmFilename {
-  let random = '';
+  let ticks = '';
   for (let i = 3; i < 16 && bytes[offset + i] !== 0; i++) {
-    random += String.fromCharCode(bytes[offset + i]);
+    ticks += String.fromCharCode(bytes[offset + i]);
   }
   return {
     mac: bytesToHex(bytes.subarray(offset, offset + 3)).toUpperCase(),
-    random,
+    ticks,
     edits: bytes[offset + 16] | (bytes[offset + 17] << 8),
   };
 }
 
 function isEqualPpmFilename(a: PpmFilename, b: PpmFilename): boolean {
-  return (
-    a.mac.toUpperCase() === b.mac.toUpperCase() && a.random === b.random && a.edits === b.edits
-  );
+  return a.mac.toUpperCase() === b.mac.toUpperCase() && a.ticks === b.ticks && a.edits === b.edits;
 }
 
 export function writePpmFilename(bytes: Uint8Array, offset: number, name: PpmFilename): void {
@@ -70,9 +69,9 @@ export function writePpmFilename(bytes: Uint8Array, offset: number, name: PpmFil
     `PPM filename MAC must be 6 hex digits, got "${name.mac}"`,
   );
   check(
-    name.random.length <= 13,
+    name.ticks.length <= 13,
     'INVALID_ARGUMENT',
-    'PPM filename random part must be at most 13 characters',
+    'PPM filename tick part must be at most 13 characters',
   );
   check(
     Number.isInteger(name.edits) && name.edits >= 0 && name.edits <= 0xffff,
@@ -82,8 +81,8 @@ export function writePpmFilename(bytes: Uint8Array, offset: number, name: PpmFil
   if (isEqualPpmFilename(readPpmFilename(bytes, offset), name)) return;
   bytes.set(hexToBytes(name.mac), offset);
   bytes.fill(0, offset + 3, offset + 16);
-  for (let i = 0; i < name.random.length; i++) {
-    bytes[offset + 3 + i] = name.random.charCodeAt(i) & 0xff;
+  for (let i = 0; i < name.ticks.length; i++) {
+    bytes[offset + 3 + i] = name.ticks.charCodeAt(i) & 0xff;
   }
   bytes[offset + 16] = name.edits & 0xff;
   bytes[offset + 17] = name.edits >> 8;
@@ -91,8 +90,8 @@ export function writePpmFilename(bytes: Uint8Array, offset: number, name: PpmFil
 
 /** Root fragment: 3-byte MAC plus the first 10 characters of the name packed as hex. */
 export function createPpmRootFragment(name: PpmFilename): string {
-  const random = name.random.slice(0, 10).padEnd(10, '0');
-  return (name.mac + (isHex(random) ? random : '0000000000')).toUpperCase();
+  const ticks = name.ticks.slice(0, 10).padEnd(10, '0');
+  return (name.mac + (isHex(ticks) ? ticks : '0000000000')).toUpperCase();
 }
 
 /** The name used on SD cards and system memory: the first character becomes a checksum. */
@@ -113,10 +112,23 @@ function randomHex(count: number, random: () => number): string {
   return text;
 }
 
-/** New filename for a console whose MAC address ends with `mac` (6 hex digits). */
-export function createPpmFilename(mac: string, random: () => number = Math.random): PpmFilename {
+/**
+ * New filename for a console whose MAC address ends with `mac`, made at `time` (seconds since
+ * 2000). Like the app, the middle part is the console's tick count at that moment; `random`
+ * picks the moment within the second.
+ */
+export function createPpmFilename(
+  mac: string,
+  time: number = currentTimestamp(),
+  random: () => number = Math.random,
+): PpmFilename {
   check(isHex(mac, 6), 'INVALID_ARGUMENT', 'MAC suffix must be 6 hex digits');
-  return { mac: mac.toUpperCase(), random: randomHex(13, random), edits: 0 };
+  const ticks = Math.floor((time + random()) * PPM_TICKS_PER_SECOND);
+  return {
+    mac: mac.toUpperCase(),
+    ticks: ticks.toString(16).toUpperCase().padStart(13, '0'),
+    edits: 0,
+  };
 }
 
 /** Random, well-formed Flipnote Studio ID (region 1, zero constant at index 7). */
