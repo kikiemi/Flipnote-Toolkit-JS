@@ -1,0 +1,83 @@
+{
+  "name": "flipnote-tools-js",
+  "version": "1.0.2",
+  "description": "Flipnote Toolkit JS: read, write, edit, convert, repair, sign and play Flipnote Studio PPM and Flipnote Studio 3D KWZ notes, and turn them into GIF, APNG, MP4 or 3D pictures and back.",
+  "keywords": [
+    "flipnote",
+    "flipnote-studio",
+    "ppm",
+    "kwz",
+    "ugomemo",
+    "dsi",
+    "3ds",
+    "gif",
+    "mp4",
+    "player",
+    "webgl",
+    "equalizer"
+  ],
+  "license": "Unlicense",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./video": {
+      "types": "./dist/video/index.d.ts",
+      "import": "./dist/video/index.js"
+    },
+    "./player": {
+      "types": "./dist/player/index.d.ts",
+      "import": "./dist/player/index.js"
+    },
+    "./node": {
+      "types": "./dist/node/index.d.ts",
+      "import": "./dist/node/index.js"
+    },
+    "./web/flipnote-player.js": "./dist/web/flipnote-player.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "flipnote-tools": "./dist/cli/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./dist/cli/cli.js",
+    "./dist/player/standalone.js",
+    "./dist/web/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.json && node scripts/build-web.mjs",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test tests/ppm.test.mjs",
+    "test:ppm-rom": "npm run build && node scripts/check-ppm-rom.mjs",
+    "format": "prettier --write .",
+    "prepack": "npm run build"
+  },
+  "peerDependencies": {
+    "mediabunny": ">=1.45.0"
+  },
+  "peerDependenciesMeta": {
+    "mediabunny": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "esbuild": "0.28.2",
+    "mediabunny": "1.62.0",
+    "prettier": "3.9.10",
+    "typescript": "^7.0.2"
+  }
+}
